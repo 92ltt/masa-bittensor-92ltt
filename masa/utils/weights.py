@@ -53,6 +53,8 @@ def normalize_max_weight(
     weights = x.copy()
     values = np.sort(weights)
 
+    logging.debug("normalize_max_weight --> come here")
+
     # if x.sum() == 0 or x.shape[0] * limit <= 1:
     if np.sum(x) == 0 or x.shape[0] * limit <= 1:
         return np.ones_like(x) / x.shape[0]
