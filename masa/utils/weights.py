@@ -53,7 +53,8 @@ def normalize_max_weight(
     weights = x.copy()
     values = np.sort(weights)
 
-    if x.sum() == 0 or x.shape[0] * limit <= 1:
+    # if x.sum() == 0 or x.shape[0] * limit <= 1:
+    if np.sum(x) == 0 or x.shape[0] * limit <= 1:
         return np.ones_like(x) / x.shape[0]
     else:
         estimation = values / values.sum()
@@ -241,6 +242,7 @@ def process_weights_for_netuid(
 
         logging.debug("non_zero_weights_filtered:")
         logging.debug(non_zero_weights_filtered)
+
     elif torch.is_tensor(non_zero_weights):
         logging.debug("--PyTorch--")
         # PyTorch tensor logic
