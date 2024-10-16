@@ -39,7 +39,7 @@ U16_MAX = 65535
 @legacy_torch_api_compat
 def normalize_max_weight(
     x: Union[NDArray[np.float32], "torch.FloatTensor"], limit: float = 0.1
-):
+) -> Union[NDArray[np.float32], "torch.FloatTensor"]:
     """Normalizes the tensor x so that sum(x) = 1 and the max value is not greater than the limit.
     Args:
         x (:obj:`np.float32`): Tensor to be max_value normalized.
@@ -306,9 +306,9 @@ def process_weights_for_netuid(
 
     # Normalize weights and return.: 
     # normalized_weights = normalize_max_weight(
-    xxxx = normalize_max_weight(
-        x=non_zero_weights, limit=max_weight_limit
-    )
+    # xxxx = normalize_max_weight(
+    #     x=non_zero_weights, limit=max_weight_limit
+    # )
     logging.debug("222non_zero_weights", non_zero_weights)
     logging.debug("222non_zero_weight_uids", non_zero_weight_uids)
 
