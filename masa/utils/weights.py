@@ -111,7 +111,7 @@ def process_weights_for_netuid(
         Union[tuple["torch.Tensor", "torch.FloatTensor"], tuple[NDArray[np.int64], NDArray[np.float32]]]: tuple containing the array of user IDs and the corresponding normalized weights. The data type of the return matches the type of the input weights (NumPy or PyTorch).
     """
 
-    # logging.debug("process_weights_for_netuid()")
+    logging.debug("process_weights_for_netuid( come here)")
     # logging.debug("weights", *weights)
     # logging.debug("netuid", netuid)
     # logging.debug("subtensor", subtensor)
@@ -134,9 +134,9 @@ def process_weights_for_netuid(
     quantile = exclude_quantile / U16_MAX
     min_allowed_weights = subtensor.min_allowed_weights(netuid=netuid)
     max_weight_limit = subtensor.max_weight_limit(netuid=netuid)
-    logging.debug("quantile", quantile)
-    logging.debug("min_allowed_weights", min_allowed_weights)
-    logging.debug("max_weight_limit", max_weight_limit)
+    ##logging.debug("quantile", quantile)
+    ##logging.debug("min_allowed_weights", min_allowed_weights)
+    ##logging.debug("max_weight_limit", max_weight_limit)
 
     # Find all non zero weights.
     non_zero_weight_idx = (
@@ -186,7 +186,7 @@ def process_weights_for_netuid(
         )
         return nw_arange, normalized_weights
 
-    logging.debug("non_zero_weights", *non_zero_weights)
+    ##logging.debug("non_zero_weights", *non_zero_weights)
 
     # Compute the exclude quantile and find the weights in the lowest quantile
     max_exclude = max(0, len(non_zero_weights) - min_allowed_weights) / len(
@@ -198,20 +198,20 @@ def process_weights_for_netuid(
         if use_torch()
         else np.quantile(non_zero_weights, exclude_quantile)
     )
-    logging.debug("max_exclude", max_exclude)
-    logging.debug("exclude_quantile", exclude_quantile)
-    logging.debug("lowest_quantile", lowest_quantile)
+    ##logging.debug("max_exclude", max_exclude)
+    ##logging.debug("exclude_quantile", exclude_quantile)
+    ##logging.debug("lowest_quantile", lowest_quantile)
 
     # Exclude all weights below the allowed quantile.
     non_zero_weight_uids = non_zero_weight_uids[lowest_quantile <= non_zero_weights]
     non_zero_weights = non_zero_weights[lowest_quantile <= non_zero_weights]
     logging.debug("non_zero_weight_uids", *non_zero_weight_uids)
-    logging.debug("non_zero_weights", *non_zero_weights)
+    ##logging.debug("non_zero_weights", *non_zero_weights)
 
     # Normalize weights and return.
     normalized_weights = normalize_max_weight(
         x=non_zero_weights, limit=max_weight_limit
     )
-    logging.debug("final_weights", non_zero_weights)
+    ##logging.debug("final_weights", non_zero_weights)
 
     return non_zero_weight_uids, non_zero_weights

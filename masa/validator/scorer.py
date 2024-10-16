@@ -42,7 +42,7 @@ class Scorer:
     async def score_miner_volumes(self):
         volumes = self.validator.volumes
         
-        bt.logging.debug(f"*   **   ** score_miner_volumes |volumes={volumes}")
+        bt.logging.debug(f"@@score_miner_volumes |volumes={volumes}")
 
         miner_volumes = {}
         for volume in volumes[-6:]:  # note, take the last 6 tempos
@@ -67,8 +67,8 @@ class Scorer:
             rewards = [1]
         else:
 
-            bt.logging.debug(f"*   **   **  |miner_volumes={miner_volumes}")
-            bt.logging.debug(f"*   **   **  |mean_volume={mean_volume} |std_dev_volume={std_dev_volume}")
+            bt.logging.debug(f"@@|miner_volumes={miner_volumes}")
+            bt.logging.debug(f"@@|mean_volume={mean_volume} |std_dev_volume={std_dev_volume}")
             rewards = [
                 self.kurtosis_based_score(
                     miner_volumes[uid], mean_volume, std_dev_volume
@@ -78,18 +78,18 @@ class Scorer:
         scores = torch.FloatTensor(rewards).to(self.validator.device)
 
 
-        bt.logging.debug(f"*   **   **  rewards={rewards}")
-        bt.logging.debug(f"*   **   **  before update_scores: scores={scores}, valid_miner_uids={valid_miner_uids}")
+        bt.logging.debug(f"@@rewards={rewards}")
+        bt.logging.debug(f"@@scores={scores}, valid_miner_uids={valid_miner_uids}")
         
         self.validator.update_scores(scores, valid_miner_uids)
         if self.validator.should_set_weights():
-            bt.logging.debug(f"*   **   **: should_set_weights = True ")
+            bt.logging.debug(f"@@should_set_weights = True ")
             try:
                 self.validator.set_weights()
             except Exception as e:
                 bt.logging.error(f"Failed to set weights: {e}")
         else:
-            bt.logging.info(f"*   **   **: should_set_weights = FALSE FALSE FALSE FALSE FALSE FALSE")
+            bt.logging.info(f"@@: should_set_weights = FALSE FALSE FALSE FALSE FALSE FALSE")
 
         self.validator.last_scoring_block = self.validator.subtensor.block
         if volumes:

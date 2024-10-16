@@ -323,7 +323,7 @@ class BaseValidatorNeuron(BaseNeuron):
         raw_weights = torch.nn.functional.normalize(self.scores, p=1, dim=0)
         cpu_raw_weights = raw_weights.to("cpu").numpy()
 
-        bt.logging.info(f"****** ^_^ ******* self.subtensor.set_weights |uids: {self.metagraph.uids} |weights: {cpu_raw_weights} |self.config.netuid: {self.config.netuid}  |self.subtensor: {self.subtensor} |self.metagraph: {self.metagraph} ")
+        bt.logging.info(f"@@subtensor.set_weights |uids: {self.metagraph.uids} |weights: {cpu_raw_weights} |self.config.netuid: {self.config.netuid}  |self.subtensor: {self.subtensor} |self.metagraph: {self.metagraph} ")
 
 #  ****** ^_^ ******* self.subtensor.set_weights
 # uids: [0 1 2 3 4 5 6 7]
@@ -350,7 +350,7 @@ class BaseValidatorNeuron(BaseNeuron):
             uids=processed_weight_uids, weights=processed_weights
         )
 
-        bt.logging.info(f"****** ^_^ ******* Setting weights: {uint_weights} for uids: {uint_uids}")
+        bt.logging.info(f"@@Setting weights: {uint_weights} for uids: {uint_uids}")
 
         # Set the weights on chain via our subtensor connection.
         result, msg = self.subtensor.set_weights(
@@ -362,7 +362,7 @@ class BaseValidatorNeuron(BaseNeuron):
             wait_for_inclusion=False,
             version_key=self.spec_version,
         )
-        bt.logging.info(f"****** ^_^ ******* self.subtensor.set_weights |wallet: {self.wallet} |netuid: {self.config.netuid} |uids: {uint_uids} |weights: {uint_weights} |version_key: {self.spec_version}")
+        bt.logging.info(f"@@self.subtensor.set_weights |wallet: {self.wallet} |netuid: {self.config.netuid} |uids: {uint_uids} |weights: {uint_weights} |version_key: {self.spec_version}")
 
         if result is True:
             bt.logging.success("set_weights on chain successfully!")
