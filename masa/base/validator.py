@@ -343,6 +343,8 @@ class BaseValidatorNeuron(BaseNeuron):
             metagraph=self.metagraph,
         )
 
+        bt.logging.info("@@process_weights_for_netuid DONE $$$")
+
         (
             uint_uids,
             uint_weights,

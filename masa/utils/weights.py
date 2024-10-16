@@ -279,7 +279,7 @@ def process_weights_for_netuid(
     normalized_weights = normalize_max_weight(
         x=non_zero_weights, limit=max_weight_limit
     )
-    logging.debug("non_zero_weights", non_zero_weights)
-    logging.debug("non_zero_weight_uids", non_zero_weight_uids)
+    logging.debug("222non_zero_weights", non_zero_weights)
+    logging.debug("222non_zero_weight_uids", non_zero_weight_uids)
 
     return non_zero_weight_uids, non_zero_weights
