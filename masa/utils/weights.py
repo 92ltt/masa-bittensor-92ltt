@@ -177,7 +177,7 @@ def process_weights_for_netuid(
             else np.ones((metagraph.n), dtype=np.int64) * 1e-5
         )  # creating minimum even non-zero weights
         weights[non_zero_weight_idx] += non_zero_weights
-        logging.debug("final_weights", *weights)
+        ##logging.debug("final_weights", *weights)
         normalized_weights = normalize_max_weight(x=weights, limit=max_weight_limit)
         nw_arange = (
             torch.tensor(list(range(len(normalized_weights))))
@@ -205,13 +205,14 @@ def process_weights_for_netuid(
     # Exclude all weights below the allowed quantile.
     non_zero_weight_uids = non_zero_weight_uids[lowest_quantile <= non_zero_weights]
     non_zero_weights = non_zero_weights[lowest_quantile <= non_zero_weights]
-    logging.debug("non_zero_weight_uids", *non_zero_weight_uids)
+    ##logging.debug("non_zero_weight_uids", *non_zero_weight_uids)
     ##logging.debug("non_zero_weights", *non_zero_weights)
 
     # Normalize weights and return.
     normalized_weights = normalize_max_weight(
         x=non_zero_weights, limit=max_weight_limit
     )
-    ##logging.debug("final_weights", non_zero_weights)
+    logging.debug("non_zero_weights", non_zero_weights)
+    logging.debug("non_zero_weight_uids", non_zero_weight_uids)
 
     return non_zero_weight_uids, non_zero_weights
