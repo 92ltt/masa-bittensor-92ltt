@@ -219,22 +219,28 @@ def process_weights_for_netuid(
     # Kiểm tra xem bạn đang sử dụng NumPy hay PyTorch
     if isinstance(non_zero_weights, np.ndarray):
         logging.debug("--NumPy--")
-        # NumPy array logic
-        # Kiểm tra xem valid_indices có hoạt động đúng không
-        print("non_zero_weights:", non_zero_weights)
-        print("lowest_quantile:", lowest_quantile)
+        # Kiểm tra và in ra non_zero_weights cùng lowest_quantile
+        logging.debug("non_zero_weights:")
+        logging.debug(non_zero_weights)
 
-        # Tạo mảng boolean valid_indices
+        logging.debug("lowest_quantile:")
+        logging.debug(lowest_quantile)
+
+        # Tạo mảng boolean valid_indices để lọc các weights
         valid_indices = non_zero_weights >= lowest_quantile
-        print("valid_indices:", valid_indices)  # Mảng boolean True/False
+        logging.debug("valid_indices:")
+        logging.debug(valid_indices)
 
         # Sử dụng valid_indices để lọc mảng non_zero_weights và non_zero_weight_uids
         non_zero_weight_uids_filtered = non_zero_weight_uids[valid_indices]
         non_zero_weights_filtered = non_zero_weights[valid_indices]
 
-        # In kết quả sau khi lọc
-        print("non_zero_weight_uids_filtered:", non_zero_weight_uids_filtered)
-        print("non_zero_weights_filtered:", non_zero_weights_filtered)
+        # In kết quả sau khi lọc non_zero_weights và non_zero_weight_uids
+        logging.debug("non_zero_weight_uids_filtered:")
+        logging.debug(non_zero_weight_uids_filtered)
+
+        logging.debug("non_zero_weights_filtered:")
+        logging.debug(non_zero_weights_filtered)
     elif torch.is_tensor(non_zero_weights):
         logging.debug("--PyTorch--")
         # PyTorch tensor logic
