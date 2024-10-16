@@ -218,12 +218,14 @@ def process_weights_for_netuid(
 
     # Kiểm tra xem bạn đang sử dụng NumPy hay PyTorch
     if isinstance(non_zero_weights, np.ndarray):
+        logging.debug("--NumPy--")
         # NumPy array logic
         valid_indices = non_zero_weights >= lowest_quantile
         non_zero_weight_uids = non_zero_weight_uids[valid_indices]
         non_zero_weights = non_zero_weights[valid_indices]
 
     elif torch.is_tensor(non_zero_weights):
+        logging.debug("--PyTorch--")
         # PyTorch tensor logic
         valid_indices = non_zero_weights >= lowest_quantile
         non_zero_weight_uids = non_zero_weight_uids[valid_indices]
