@@ -54,39 +54,54 @@ def normalize_max_weight(
     values = np.sort(weights)
 
     logging.debug("normalize_max_weight --> come here")
-
-    # if x.sum() == 0 or x.shape[0] * limit <= 1:
+    logging.debug("Initial x: %s", x)
+    logging.debug("weights copy: %s", weights)
+    logging.debug("Sorted values: %s", values)
+    
+    # Kiểm tra tổng và giá trị điều kiện ban đầu
     if np.sum(x) == 0 or x.shape[0] * limit <= 1:
+        logging.debug("Sum of x is 0 or condition met (x.shape[0] * limit <= 1)")
         return np.ones_like(x) / x.shape[0]
     else:
-        estimation = values / values.sum()
-
-        # if estimation.max() <= limit:
-        #     return weights / weights.sum()
+        estimation = values / np.sum(values)
+        logging.debug("Estimation: %s", estimation)
+        
+        # Kiểm tra giá trị tối đa của estimation
         if np.max(estimation) <= limit:
+            logging.debug("Max of estimation <= limit, returning normalized weights")
             return weights / np.sum(weights)
 
         # Find the cumulative sum and sorted tensor
         cumsum = np.cumsum(estimation, 0)
+        logging.debug("Cumulative sum (cumsum): %s", cumsum)
 
         # Determine the index of cutoff
         estimation_sum = np.array(
             [(len(values) - i - 1) * estimation[i] for i in range(len(values))]
         )
+        logging.debug("Estimation sum: %s", estimation_sum)
+        
         n_values = (estimation / (estimation_sum + cumsum + epsilon) < limit).sum()
+        logging.debug("Number of values less than limit: %d", n_values)
 
         # Determine the cutoff based on the index
         cutoff_scale = (limit * cumsum[n_values - 1] - epsilon) / (
             1 - (limit * (len(estimation) - n_values))
         )
-        cutoff = cutoff_scale * values.sum()
+        logging.debug("Cutoff scale: %f", cutoff_scale)
+        
+        cutoff = cutoff_scale * np.sum(values)
+        logging.debug("Cutoff value: %f", cutoff)
 
         # Applying the cutoff
         weights[weights > cutoff] = cutoff
+        logging.debug("Weights after applying cutoff: %s", weights)
 
-        y = weights / weights.sum()
+        y = weights / np.sum(weights)
+        logging.debug("Final normalized weights: %s", y)
 
         return y
+
 
 
 # The community uses / bittensor does not
