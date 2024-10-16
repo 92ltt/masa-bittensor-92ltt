@@ -208,8 +208,12 @@ def process_weights_for_netuid(
     
 
     logging.debug("@@lowest_quantile", lowest_quantile)
-    logging.debug("@@non_zero_weights", non_zero_weights)
-    logging.debug("@@non_zero_weight_uids", non_zero_weight_uids)
+    logging.debug("@@non_zero_weights")
+    logging.debug(non_zero_weights)
+    logging.debug("@@non_zero_weight_uids")
+    logging.debug(non_zero_weight_uids)
+    logging.debug("--endlog--")
+
     # logging.debug("@@non_zero_weights", non_zero_weights)
 
     non_zero_weight_uids = non_zero_weight_uids[non_zero_weights >= lowest_quantile]
