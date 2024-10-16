@@ -220,10 +220,21 @@ def process_weights_for_netuid(
     if isinstance(non_zero_weights, np.ndarray):
         logging.debug("--NumPy--")
         # NumPy array logic
-        valid_indices = non_zero_weights >= lowest_quantile
-        non_zero_weight_uids = non_zero_weight_uids[valid_indices]
-        non_zero_weights = non_zero_weights[valid_indices]
+        # Kiểm tra xem valid_indices có hoạt động đúng không
+        print("non_zero_weights:", non_zero_weights)
+        print("lowest_quantile:", lowest_quantile)
 
+        # Tạo mảng boolean valid_indices
+        valid_indices = non_zero_weights >= lowest_quantile
+        print("valid_indices:", valid_indices)  # Mảng boolean True/False
+
+        # Sử dụng valid_indices để lọc mảng non_zero_weights và non_zero_weight_uids
+        non_zero_weight_uids_filtered = non_zero_weight_uids[valid_indices]
+        non_zero_weights_filtered = non_zero_weights[valid_indices]
+
+        # In kết quả sau khi lọc
+        print("non_zero_weight_uids_filtered:", non_zero_weight_uids_filtered)
+        print("non_zero_weights_filtered:", non_zero_weights_filtered)
     elif torch.is_tensor(non_zero_weights):
         logging.debug("--PyTorch--")
         # PyTorch tensor logic
