@@ -80,7 +80,10 @@ def normalize_max_weight(
         # Kiểm tra giá trị tối đa của estimation
         if np.max(estimation) <= limit:
             logging.debug("Max of estimation <= limit, returning normalized weights")
-            return weights / np.sum(weights)
+            x = weights / np.sum(weights)
+            logging.debug("x = ")
+            logging.debug(x)
+            return x
 
         # Tính cumulative sum (cumsum)
         cumsum = np.cumsum(estimation, 0)
