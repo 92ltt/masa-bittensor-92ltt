@@ -61,8 +61,10 @@ def normalize_max_weight(
     else:
         estimation = values / values.sum()
 
-        if estimation.max() <= limit:
-            return weights / weights.sum()
+        # if estimation.max() <= limit:
+        #     return weights / weights.sum()
+        if np.max(estimation) <= limit:
+            return weights / np.sum(weights)
 
         # Find the cumulative sum and sorted tensor
         cumsum = np.cumsum(estimation, 0)
