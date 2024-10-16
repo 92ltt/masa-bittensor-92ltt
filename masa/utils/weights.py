@@ -54,53 +54,79 @@ def normalize_max_weight(
     values = np.sort(weights)
 
     logging.debug("normalize_max_weight --> come here")
-    logging.debug("Initial x: %s", x)
-    logging.debug("weights copy: %s", weights)
-    logging.debug("Sorted values: %s", values)
     
+    logging.debug("Initial x:")
+    logging.debug(x)
+    logging.debug(type(x))
+    
+    logging.debug("weights copy:")
+    logging.debug(weights)
+    logging.debug(type(weights))
+    
+    logging.debug("Sorted values:")
+    logging.debug(values)
+    logging.debug(type(values))
+
     # Kiểm tra tổng và giá trị điều kiện ban đầu
     if np.sum(x) == 0 or x.shape[0] * limit <= 1:
         logging.debug("Sum of x is 0 or condition met (x.shape[0] * limit <= 1)")
         return np.ones_like(x) / x.shape[0]
     else:
         estimation = values / np.sum(values)
-        logging.debug("Estimation: %s", estimation)
+        logging.debug("Estimation:")
+        logging.debug(estimation)
+        logging.debug(type(estimation))
         
         # Kiểm tra giá trị tối đa của estimation
         if np.max(estimation) <= limit:
             logging.debug("Max of estimation <= limit, returning normalized weights")
             return weights / np.sum(weights)
 
-        # Find the cumulative sum and sorted tensor
+        # Tính cumulative sum (cumsum)
         cumsum = np.cumsum(estimation, 0)
-        logging.debug("Cumulative sum (cumsum): %s", cumsum)
+        logging.debug("Cumulative sum (cumsum):")
+        logging.debug(cumsum)
+        logging.debug(type(cumsum))
 
-        # Determine the index of cutoff
+        # Tính estimation_sum
         estimation_sum = np.array(
             [(len(values) - i - 1) * estimation[i] for i in range(len(values))]
         )
-        logging.debug("Estimation sum: %s", estimation_sum)
+        logging.debug("Estimation sum:")
+        logging.debug(estimation_sum)
+        logging.debug(type(estimation_sum))
         
+        # Xác định số lượng giá trị nhỏ hơn giới hạn
         n_values = (estimation / (estimation_sum + cumsum + epsilon) < limit).sum()
-        logging.debug("Number of values less than limit: %d", n_values)
+        logging.debug("Number of values less than limit:")
+        logging.debug(n_values)
 
-        # Determine the cutoff based on the index
+        # Xác định giá trị cutoff dựa trên index
         cutoff_scale = (limit * cumsum[n_values - 1] - epsilon) / (
             1 - (limit * (len(estimation) - n_values))
         )
-        logging.debug("Cutoff scale: %f", cutoff_scale)
+        logging.debug("Cutoff scale:")
+        logging.debug(cutoff_scale)
+        logging.debug(type(cutoff_scale))
         
         cutoff = cutoff_scale * np.sum(values)
-        logging.debug("Cutoff value: %f", cutoff)
+        logging.debug("Cutoff value:")
+        logging.debug(cutoff)
+        logging.debug(type(cutoff))
 
-        # Applying the cutoff
+        # Áp dụng cutoff
         weights[weights > cutoff] = cutoff
-        logging.debug("Weights after applying cutoff: %s", weights)
+        logging.debug("Weights after applying cutoff:")
+        logging.debug(weights)
+        logging.debug(type(weights))
 
         y = weights / np.sum(weights)
-        logging.debug("Final normalized weights: %s", y)
+        logging.debug("Final normalized weights:")
+        logging.debug(y)
+        logging.debug(type(y))
 
         return y
+
 
 
 
