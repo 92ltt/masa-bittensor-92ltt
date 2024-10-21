@@ -1,49 +1,43 @@
 import bittensor as bt
+import re
 from typing import List, Optional, Any, Dict
-from masa.miner.masa_protocol_request import MasaProtocolRequest
-from masa.types.twitter import ProtocolTwitterTweetResponse
-from sentence_transformers import SentenceTransformer
+from datetime import datetime, UTC
+import json
 import torch
+from sentence_transformers import SentenceTransformer
+from masa.types.twitter import ProtocolTwitterTweetResponse
+import requests
 
-class RecentTweetsSynapse(bt.Synapse):
-    query: str
-    count: int
-    response: Optional[Any] = None
-
-    def deserialize(self) -> Optional[Any]:
-        return self.response
-
-
-def forward_recent_tweets(synapse: RecentTweetsSynapse) -> RecentTweetsSynapse:
-    synapse.response = TwitterTweetsRequest().get_recent_tweets(synapse)
-    return synapse
-
-
-class TwitterTweetsRequest(MasaProtocolRequest):
-    def __init__(self):
-        super().__init__()
+class TwitterTweetsRequest():
 
     def get_recent_tweets(
-        self, synapse: RecentTweetsSynapse
-    ) -> Optional[List[ProtocolTwitterTweetResponse]]:
-        bt.logging.info(f"Getting {synapse.count} recent tweets for: {synapse.query}")
-        response = self.post(
-            "/data/twitter/tweets/recent",
-            body={"query": synapse.query, "count": synapse.count},
+        self
+    ):
+        response = requests.post(
+            f"http://localhost:40810/api/v1/data/twitter/tweets/recent",
+            json={"query": '("eth") since:2024-10-16', "count": 200},
+            headers={"accept": "application/json", "Content-Type": "application/json"},
+            timeout=90,
         )
 
         if response.ok:
-            data = self.format(response)
-            bt.logging.info("TWEETS===START")
+            data = dict(response.json()).get("data", [])
 
-            countResponse = 0 if not data else len(data)
-            bt.logging.success(f"Getting Total: {countResponse}")
+            bt.logging.info("TWEETS===START")
+            #bt.logging.success(f"Getting Total: {len(data)}")
+
+            # print("===TRUOC===")
+            # print(data)
+            # print("===ENDTRUOC===")
 
             data = self.update_data(data)
+            bt.logging.debug(data[:3])
 
-            countResponse = 0 if not data else len(data)
-            bt.logging.success(f"Sending Total: {countResponse} tweets to validator")
+            # print("===SAU===")
+            # print(data)
+            # print("===ENDSAU===")
 
+            #bt.logging.success(f"Sending Total: {len(data)} tweets to validator")
             bt.logging.info("TWEETS===END")
             return data
         else:
@@ -158,8 +152,11 @@ class TwitterTweetsRequest(MasaProtocolRequest):
                     tweet_embedding,
                 )
             )
-            if similarity >= 60:  # pretty strict
+            if similarity >= 90:  # pretty strict
                 return True
+            else:
+                print(f"similarity: {similarity}")
+                print(tweet_data)
 
             return False
 
@@ -170,9 +167,11 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         new_tweets = [update_fields(tweet_data["Tweet"]) or tweet_data for tweet_data in tweets]
 
         # 3. Đếm số lượng tweet hợp lệ trong danh sách mới
+        print('NEW:')
         new_tweets_valid = sum(1 for tweet_data in new_tweets if checkValidSimilarity(tweet_data))
 
         countResponse = 0 if not tweets else len(tweets)
-        #print(f"old_tweets_valid={old_tweets_valid}/{countResponse} VS new_tweets_valid={new_tweets_valid}/{countResponse}")
-        bt.logging.info(f"old_tweets_valid={old_tweets_valid}/{countResponse} VS new_tweets_valid={new_tweets_valid}/{countResponse}")
+        print(f"old_tweets_valid={old_tweets_valid}/{countResponse} VS new_tweets_valid={new_tweets_valid}/{countResponse}")
         return new_tweets
+
+TwitterTweetsRequest().get_recent_tweets()

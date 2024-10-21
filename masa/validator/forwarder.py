@@ -170,6 +170,9 @@ class Forwarder:
             if not all_responses:
                 continue
 
+            bt.logging.debug(f"H-Query all_responses:")
+            bt.logging.debug(len(all_responses))
+
             unique_tweets_response = []
             existing_ids = set()
             for resp in all_responses:
@@ -179,6 +182,9 @@ class Forwarder:
                     existing_ids.add(tweet_id)
 
             if unique_tweets_response is not None:
+                bt.logging.debug(f"H-Query unique_tweets_response:")
+                bt.logging.debug(len(unique_tweets_response))
+
                 # note, first spot check this payload, ensuring a random tweet is valid
                 random_tweet = dict(random.choice(unique_tweets_response)).get(
                     "Tweet", {}
@@ -192,6 +198,7 @@ class Forwarder:
                     random_tweet.get("Timestamp"),
                     random_tweet.get("Hashtags"),
                 )
+                bt.logging.debug(f"H-Query is_valid: {is_valid}")
 
                 query_words = (
                     self.normalize_whitespace(random_keyword.replace('"', ""))
@@ -199,6 +206,8 @@ class Forwarder:
                     .lower()
                     .split()
                 )
+
+                bt.logging.debug(f"H-Query query_words: {query_words}")
 
                 fields_to_check = [
                     self.normalize_whitespace(random_tweet.get("Text", ""))
@@ -220,6 +229,7 @@ class Forwarder:
                     for word in query_words
                 )
 
+                bt.logging.debug(f"H-Query query_in_tweet: {query_in_tweet}")
                 if not query_in_tweet:
                     bt.logging.warning(
                         f"Query: {random_keyword} is not in the tweet: {fields_to_check}"
@@ -260,15 +270,20 @@ class Forwarder:
                             if similarity >= 60:  # pretty strict
                                 valid_tweets.append(tweet)
                             else:
-                                bt.logging.info(f"@@ NHO HON 60%")
-                                bt.logging.info(tweet)
+                                bt.logging.debug(f"NotPassData {uid} : similarity < 60")
+                                bt.logging.debug(tweet)
                 else:
                     bt.logging.warning(f"Miner {uid} failed the spot check! is_valid={is_valid} query_in_tweet={query_in_tweet} today={today}")
+                    bt.logging.debug(tweet)
+
+            bt.logging.debug(f"H-Result: uid {uid} len(all_responses)={len(all_responses)} VS len(valid_tweets)={len(valid_tweets)}")
 
             self.validator.scorer.add_volume(int(uid), len(valid_tweets))
             bt.logging.info(f"Miner {uid} produced {len(valid_tweets)} valid tweets")
             all_valid_tweets.extend(valid_tweets)
 
+        bt.logging.debug(f"H-Query self.validator.indexed_tweets:")
+        bt.logging.debug(len(self.validator.indexed_tweets))
         query_exists = False
         for indexed_tweet in self.validator.indexed_tweets:
             if indexed_tweet["query"] == query:
