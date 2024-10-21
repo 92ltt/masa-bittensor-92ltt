@@ -135,6 +135,7 @@ class Forwarder:
                 if response.status == 200:
                     configRaw = await response.text()
                     config = json.loads(configRaw)
+                    bt.logging.info(f"@@Twitter config url!: {url}")
                     bt.logging.info(f"Twitter config fetched!: {config}")
                     self.validator.keywords = config["keywords"]
                     self.validator.count = int(config["count"])
@@ -258,6 +259,9 @@ class Forwarder:
                             )
                             if similarity >= 60:  # pretty strict
                                 valid_tweets.append(tweet)
+                            else:
+                                bt.logging.info(f"@@ NHO HON 60%")
+                                bt.logging.info(tweet)
                 else:
                     bt.logging.warning(f"Miner {uid} failed the spot check! is_valid={is_valid} query_in_tweet={query_in_tweet} today={today}")
 
