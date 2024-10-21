@@ -270,7 +270,7 @@ class Forwarder:
                             if similarity >= 60:  # pretty strict
                                 valid_tweets.append(tweet)
                             else:
-                                bt.logging.debug(f"NotPassData {uid} : similarity < 60")
+                                bt.logging.debug(f"NotPassData {uid} : similarity {similarity} < 60")
                                 bt.logging.debug(tweet)
                 else:
                     bt.logging.warning(f"Miner {uid} failed the spot check! is_valid={is_valid} query_in_tweet={query_in_tweet} today={today}")
