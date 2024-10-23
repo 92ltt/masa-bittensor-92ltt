@@ -157,6 +157,7 @@ class Forwarder:
         random_keyword = random.choice(self.validator.keywords)
         today = datetime.now(UTC).strftime("%Y-%m-%d")
         query = f"({random_keyword.strip()}) since:{today}"
+        bt.logging.debug(f"Checked-Query {query}:")
         request = RecentTweetsSynapse(query=query, count=self.validator.count)
 
         responses, miner_uids = await self.forward_request(
@@ -198,7 +199,7 @@ class Forwarder:
                     random_tweet.get("Timestamp"),
                     random_tweet.get("Hashtags"),
                 )
-                bt.logging.debug(f"H-Query is_valid: {is_valid}")
+                bt.logging.debug(f"H-Query is_valid: {is_valid} ===> https://x.com/{random_tweet.get("Username")}/status/{random_tweet.get("ID")} - {query}")
 
                 query_words = (
                     self.normalize_whitespace(random_keyword.replace('"', ""))
