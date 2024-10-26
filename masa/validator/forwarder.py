@@ -166,6 +166,7 @@ class Forwarder:
 
         all_valid_tweets = []
         for response, uid in zip(responses, miner_uids):
+            bt.logging.debug(f"START -- UID: {uid}")
             valid_tweets = []
             all_responses = dict(response).get("response", [])
             if not all_responses:
@@ -302,6 +303,7 @@ class Forwarder:
                 break
         bt.logging.debug(f"@@ - came here 2")
         if not query_exists:
+            bt.logging.debug(f"@@ - came here 3")
             payload = {
                 "query": query,
                 "tweets": [
@@ -313,6 +315,8 @@ class Forwarder:
                 ],
             }
             self.validator.indexed_tweets.append(payload)
+
+        bt.logging.debug(f"@@ - came here 4")
 
         # note, set the last volume block to the current block
         self.validator.last_volume_block = self.validator.subtensor.block
