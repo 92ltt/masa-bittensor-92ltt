@@ -99,7 +99,7 @@ def testAllValidData(data, query):
     print(f"++++++Keyword={keyword}")
     for resp in data:
         tweet = resp.get("Tweet", {})
-        tweet_valid = True
+        tweet_valid = "Ignore"
         #tweet_valid = checkTweetValid(tweet)
         query_in_tweet = checkQueryInTweet(tweet, keyword)
         is_same_day = checkIsSameDay(tweet)
@@ -172,11 +172,14 @@ def testNewQuery():
 
 
 def getMoreQuery(oldQuery):
+    if "#" in oldQuery:
+        return ""
+    
     usernameList = [
         "amy_altcoindapp",
         "ariestakingswap",
-        "bedecentralized",
-        "belisatoshidefi",
+        "b6decentralized",
+        "bel3satoshidefi",
         "bruniswapcrypto",
         "caissaconsensus",
         "ccocoinbasehodl",
@@ -184,8 +187,8 @@ def getMoreQuery(oldQuery):
         "desibitcoinweb3",
         "emillydusdcusdt",
         "gbnodesmemecoin",
-        "jcryptocurrency",
         "jewallettrading",
+        "jjkyfarmingmasa",
         "makemebapolygon",
         "megajesolanaxrp",
         "merveyarbitrage",
@@ -194,11 +197,12 @@ def getMoreQuery(oldQuery):
         "nicdogecointron",
         "ocefundingnodes",
         "okebittensoretf",
+        "pepptothemoon",
         "pesmartcontract",
         "stmonerobullrun",
         "talitecoinfloki",
         "teblockchainnft",
-        "tokensliquidity",
+        "tokensliquidity"
     ]
     # oldQuery có dạng: "(bitcoin) since:2024-10-22" => newQuery sẽ mong muốn: "(from:desibitcoinweb3) since:2024-10-22"
     # oldQuery có dạng: "('bitcoin price') since:2024-10-21" => newQuery sẽ mong muốn: "(from:abcbitcoinpriceghj) since:2024-10-21"
@@ -447,10 +451,10 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         moreData = getMoreData(sizeTwittersCount-len(data), getMoreQuery(query), isDev) if len(data) < sizeTwittersCount else []
         finalData = getAddedData(data, moreData)
 
-        testAllValidData(finalData, query)
+        testAllValidData(moreData, query)
 
-        bt.logging.info(f"len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
-        print(f"len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
+        bt.logging.info(f"{query} __ len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
+        print(f"{query} __ len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
         
         #finalData = update_data(finalData)
         #bt.logging.debug(finalData[:3])

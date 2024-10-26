@@ -172,6 +172,9 @@ def testNewQuery():
 
 
 def getMoreQuery(oldQuery):
+    if "#" in oldQuery:
+        return ""
+
     usernameList = [
         "amy_altcoindapp",
         "ariestakingswap",
@@ -425,7 +428,7 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         else:
             sizeTwittersCount = getSizeTwitters()
             #query = "(\"meme coin\") since:2024-10-22"
-            query = '(bitcoin) since:2024-10-22'
+            query = '(hodl) since:2024-10-26'
 
         #testNewQuery()
         #return True
@@ -437,10 +440,10 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         moreData = getMoreData(sizeTwittersCount-len(data), getMoreQuery(query), isDev) if len(data) < sizeTwittersCount else []
         finalData = getAddedData(data, moreData)
 
-        testAllValidData(finalData, query)
+        testAllValidData(moreData, query)
 
-        bt.logging.info(f"len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
-        print(f"len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
+        bt.logging.info(f"Query:{query} -- len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
+        print(f"Query:{query} -- len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
         
         #finalData = update_data(finalData)
         #bt.logging.debug(finalData[:3])
