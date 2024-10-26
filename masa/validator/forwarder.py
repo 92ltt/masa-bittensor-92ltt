@@ -288,6 +288,7 @@ class Forwarder:
         query_exists = False
         for indexed_tweet in self.validator.indexed_tweets:
             if indexed_tweet["query"] == query:
+                bt.logging.debug(f"@@ - came here 1")
                 existing_tweet_ids = {
                     tweet["Tweet"]["ID"] for tweet in indexed_tweet["tweets"]
                 }
@@ -299,7 +300,7 @@ class Forwarder:
                 indexed_tweet["tweets"].extend(unique_valid_tweets)
                 query_exists = True
                 break
-
+        bt.logging.debug(f"@@ - came here 2")
         if not query_exists:
             payload = {
                 "query": query,
