@@ -355,15 +355,15 @@ class BaseValidatorNeuron(BaseNeuron):
         bt.logging.info(f"@@Setting weights: {uint_weights} for uids: {uint_uids}")
 
         # Set the weights on chain via our subtensor connection.
-        result, msg = self.subtensor.set_weights(
-            wallet=self.wallet,
-            netuid=self.config.netuid,
-            uids=uint_uids,
-            weights=uint_weights,
-            wait_for_finalization=False,
-            wait_for_inclusion=False,
-            version_key=self.spec_version,
-        )
+        # result, msg = self.subtensor.set_weights(
+        #     wallet=self.wallet,
+        #     netuid=self.config.netuid,
+        #     uids=uint_uids,
+        #     weights=uint_weights,
+        #     wait_for_finalization=False,
+        #     wait_for_inclusion=False,
+        #     version_key=self.spec_version,
+        # )
         bt.logging.info(f"@@self.subtensor.set_weights |wallet: {self.wallet} |netuid: {self.config.netuid} |uids: {uint_uids} |weights: {uint_weights} |version_key: {self.spec_version}")
 
         if result is True:
