@@ -50,6 +50,10 @@ usernameList = [
     "hviusolanaprice",
     "dairtothemoon",
     "darbitcoinprice",
+    "atlascryptodump",
+    "jeacryptomarket",
+    "layotokenlaunch",
+    "cacryptotrading",
 ]
 
 model = SentenceTransformer(
