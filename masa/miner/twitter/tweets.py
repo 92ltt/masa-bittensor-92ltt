@@ -9,6 +9,48 @@ import re
 from masa_ai.tools.validator.main import main as validate
 from datetime import datetime, UTC
 
+usernameList = [
+    "lcrbitcoinprice",
+    "daethereumprice",
+    "swiftsethereum",
+    "jexchangemining",
+    "tyanalysisnodes",
+    "breanregulation",
+    "baby20marketcap",
+    "crugpullairdrop",
+    "thenftbnbprice",
+    "desibitcoinweb3",
+    "jjkyfarmingmasa",
+    "b6decentralized",
+    "megajesolanaxrp",
+    "emillydusdcusdt",
+    "mtwipolkadottao",
+    "nicdogecointron",
+    "mrchainlinkshib",
+    "makemebapolygon",
+    "talitecoinfloki",
+    "bruniswapcrypto",
+    "stmonerobullrun",
+    "bel3satoshidefi",
+    "cowavalanchebnb",
+    "okebittensoretf",
+    "teblockchainnft",
+    "ccocoinbasehodl",
+    "amy_altcoindapp",
+    "pepptothemoon",
+    "jewallettrading",
+    "pesmartcontract",
+    "ariestakingswap",
+    "tokensliquidity",
+    "ocefundingnodes",
+    "gbnodesmemecoin",
+    "caissaconsensus",
+    "merveyarbitrage",
+    "hviusolanaprice",
+    "dairtothemoon",
+    "darbitcoinprice",
+]
+
 model = SentenceTransformer(
     "all-MiniLM-L6-v2"
 )
@@ -170,45 +212,10 @@ def testNewQuery():
             print(f"=============================")
     print(f"--END newQuery--")
 
-
 def getMoreQuery(oldQuery):
     if "#" in oldQuery:
         return ""
     
-    usernameList = [
-        "amy_altcoindapp",
-        "ariestakingswap",
-        "b6decentralized",
-        "bel3satoshidefi",
-        "bruniswapcrypto",
-        "caissaconsensus",
-        "ccocoinbasehodl",
-        "cowavalanchebnb",
-        "desibitcoinweb3",
-        "emillydusdcusdt",
-        "gbnodesmemecoin",
-        "jewallettrading",
-        "jjkyfarmingmasa",
-        "makemebapolygon",
-        "megajesolanaxrp",
-        "merveyarbitrage",
-        "mrchainlinkshib",
-        "mtwipolkadottao",
-        "nicdogecointron",
-        "ocefundingnodes",
-        "okebittensoretf",
-        "pepptothemoon",
-        "pesmartcontract",
-        "stmonerobullrun",
-        "talitecoinfloki",
-        "teblockchainnft",
-        "tokensliquidity"
-    ]
-    # oldQuery có dạng: "(bitcoin) since:2024-10-22" => newQuery sẽ mong muốn: "(from:desibitcoinweb3) since:2024-10-22"
-    # oldQuery có dạng: "('bitcoin price') since:2024-10-21" => newQuery sẽ mong muốn: "(from:abcbitcoinpriceghj) since:2024-10-21"
-    # oldQuery có dạng: '("bitcoin price") since:2024-10-20' => newQuery sẽ mong muốn: "(from:abcbitcoinpriceghj) since:2024-10-20"
-    # oldQuery có dạng: "(#bitcoin) since:2024-11-11" => newQuery sẽ mong muốn: "(from:desibitcoinweb3) since:2024-11-11"
-      
     # Tìm từ khóa trong oldQuery (nằm trong dấu ngoặc hoặc dấu nháy đơn)
     keyword_match = re.search(r"\((.*?)\)|'([^']*)'", oldQuery)
     keyword = keyword_match.group(1) if keyword_match and keyword_match.group(1) else keyword_match.group(2) if keyword_match else None
@@ -220,17 +227,14 @@ def getMoreQuery(oldQuery):
     # Xóa khoảng trắng trong keyword để ghép thành chuỗi liên tục
     cleaned_keyword = keyword.replace("'", "").replace('"', '').replace("#", "").replace(" ", "").lower()
 
-    # Tìm username liên quan đến keyword đã làm sạch
-    matching_username = None
-    for username in usernameList:
-        if cleaned_keyword in username.lower():
-            matching_username = username
-            break
+    # Tìm tất cả các username liên quan đến keyword đã làm sạch
+    matching_usernames = [username for username in usernameList if cleaned_keyword in username.lower()]
 
-    # Nếu tìm thấy username liên quan, tạo newQuery với username
-    if matching_username:
+    # Nếu có các username khớp, tạo newQuery với các username đó
+    if matching_usernames:
         since_part = re.search(r"(since:.*)", oldQuery).group(1) if "since:" in oldQuery else ""
-        newQuery = f"(from:{matching_username}) {since_part}"
+        usernames_query = " OR ".join([f"from:{username}" for username in matching_usernames])
+        newQuery = f"({usernames_query}) {since_part}"
     else:
         newQuery = ""  # Nếu không có username nào khớp, giữ nguyên oldQuery
 
