@@ -142,7 +142,7 @@ def testAllValidData(data, query):
     keyword_match = re.search(r"\((.*?)\)|'([^']*)'", query)
     keyword = keyword_match.group(1) if keyword_match and keyword_match.group(1) else keyword_match.group(2) if keyword_match else None
 
-    print(f"++++++Keyword={keyword}")
+    #print(f"++++++Keyword={keyword}")
     for resp in data:
         tweet = resp.get("Tweet", {})
         tweet_valid = "Ignore"
@@ -150,7 +150,7 @@ def testAllValidData(data, query):
         query_in_tweet = checkQueryInTweet(tweet, keyword)
         is_same_day = checkIsSameDay(tweet)
         similarity = getSimilarityPercentage(tweet)
-        print(f"tweet_valid={tweet_valid} __ query_in_tweet={query_in_tweet} __ is_same_day={is_same_day} __ similarity={similarity}  __ https://x.com/{tweet.get("Username", 0)}/status/{tweet.get("ID", 0)}")
+        #print(f"tweet_valid={tweet_valid} __ query_in_tweet={query_in_tweet} __ is_same_day={is_same_day} __ similarity={similarity}  __ https://x.com/{tweet.get("Username", 0)}/status/{tweet.get("ID", 0)}")
 
 def checkIsSameDay(tweet):
     tweet_timestamp = datetime.fromtimestamp(
@@ -207,14 +207,14 @@ def testNewQuery():
 
         for kw in keywordList:
             oldQuery = "(" + kw.lower() + ") since:2024-10-22"
-            print(f"oldQuery={oldQuery}")
+            #print(f"oldQuery={oldQuery}")
 
             newQuery = getMoreQuery(oldQuery)
 
-            print(f"newQuery={newQuery}")
+            #print(f"newQuery={newQuery}")
 
-            print(f"=============================")
-    print(f"--END newQuery--")
+            #print(f"=============================")
+    #print(f"--END newQuery--")
 
 def getMoreQuery(oldQuery):
     if "#" in oldQuery:
@@ -243,19 +243,21 @@ def getMoreQuery(oldQuery):
         newQuery = ""  # Nếu không có username nào khớp, giữ nguyên oldQuery
 
     if not newQuery:
-        print(f"Keyword in {oldQuery} is not found in Username List")
+        #print(f"Keyword in {oldQuery} is not found in Username List")
+        bt.logging.info(f"Keyword in {oldQuery} is not found in Username List")
     return newQuery
 
 def getDefaultResponseData(sizeTwittersCount, query, isDev):
     if isDev:
-        print(f"isDev={isDev}")
-        print(f"getDefaultResponseData query: {query}")
+        #print(f"isDev={isDev}")
+        #print(f"getDefaultResponseData query: {query}")
+        bt.logging.info(f"getDefaultResponseData query: {query}")
     else:
         bt.logging.info(f"isDev={isDev}")
         bt.logging.info(f"getDefaultResponseData query: {query}")
 
     if isDev:
-        print(f"Moi truong dev tu set sizeTwittersCount=97")
+        #print(f"Moi truong dev tu set sizeTwittersCount=97")
         sizeTwittersCount = 5
         response = requests.post(
             f"http://localhost:40810/api/v1/data/twitter/tweets/recent",
@@ -279,12 +281,13 @@ def getDefaultResponseData(sizeTwittersCount, query, isDev):
 
 def getMoreData(sizeTwittersCount, query, isDev):
     if isDev:
-        print(f"getMoreData query: {query}")
+        #print(f"getMoreData query: {query}")
+        bt.logging.info(f"getMoreData query: {query}")
     else:
         bt.logging.info(f"getMoreData query: {query}")
 
     if not query:
-        print(f"Empty Query")
+        #print(f"Empty Query")
         return []
     
     if isDev:
@@ -305,7 +308,7 @@ def getMoreData(sizeTwittersCount, query, isDev):
         data = dict(response.json()).get("data", []) or []
     else:
         bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
-        print(f"Twitter recent tweets request failed with status code: {response.status_code}")
+        #print(f"Twitter recent tweets request failed with status code: {response.status_code}")
     
     return data
 
@@ -412,7 +415,7 @@ def update_data(tweets: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
     #print(f"old_tweets_valid={old_tweets_valid}/{countResponse} VS new_tweets_valid={new_tweets_valid}/{countResponse}")
     #bt.logging.info(f"old_tweets_valid={old_tweets_valid}/{countResponse} VS new_tweets_valid={new_tweets_valid}/{countResponse}")
-    print(f"UPDATED {countResponse} tweets")
+    #print(f"UPDATED {countResponse} tweets")
     
     return new_tweets
 
@@ -453,7 +456,7 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         #return True
 
         bt.logging.info(f"sizeTwittersCount={sizeTwittersCount} __ query={query}")
-        print(f"sizeTwittersCount={sizeTwittersCount} __ query={query}")
+        #print(f"sizeTwittersCount={sizeTwittersCount} __ query={query}")
         
         data = getDefaultResponseData(sizeTwittersCount, query, isDev)
         moreData = getMoreData(sizeTwittersCount-len(data), getMoreQuery(query), isDev) if len(data) < sizeTwittersCount else []
@@ -462,13 +465,13 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         testAllValidData(moreData, query)
 
         bt.logging.info(f"{query} __ len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
-        print(f"{query} __ len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
+        #print(f"{query} __ len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
         
         #finalData = update_data(finalData)
         #bt.logging.debug(finalData[:3])
         #print(finalData[:3])
 
         bt.logging.success(f"Sending Total: {len(finalData)} tweets to validator")
-        print(f"Sending Total: {len(finalData)}/{sizeTwittersCount} tweets to validator")
-
+        #print(f"Sending Total: {len(finalData)}/{sizeTwittersCount} tweets to validator")
+        self.format(finalData)
         return finalData
