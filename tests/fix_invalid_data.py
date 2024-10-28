@@ -259,7 +259,7 @@ def getDefaultResponseData(sizeTwittersCount, query, isDev):
         print(f"Moi truong dev tu set sizeTwittersCount=5")
         sizeTwittersCount = 5
         response = requests.post(
-            f"http://localhost:40810/api/v1/data/twitter/tweets/recent",
+            f"http://localhost:8080/api/v1/data/twitter/tweets/recent",
             json={"query": query, "count": sizeTwittersCount},
             headers={"accept": "application/json", "Content-Type": "application/json"},
             timeout=90,
@@ -290,7 +290,7 @@ def getMoreData(sizeTwittersCount, query, isDev):
     
     if isDev:
         response = requests.post(
-            f"http://localhost:40810/api/v1/data/twitter/tweets/recent",
+            f"http://localhost:8080/api/v1/data/twitter/tweets/recent",
             json={"query": query, "count": sizeTwittersCount},
             headers={"accept": "application/json", "Content-Type": "application/json"},
             timeout=90,
