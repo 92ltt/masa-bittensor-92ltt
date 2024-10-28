@@ -182,6 +182,7 @@ def checkQueryInTweet(tweet, keyword):
     return query_in_tweet
 
 def getSizeTwitters():
+    return 1000
     twitterConfigObj = requests.get(
         f"https://raw.githubusercontent.com/masa-finance/masa-bittensor/main/config/twitter.json",
         headers={"accept": "application/json", "Content-Type": "application/json"},
@@ -473,5 +474,5 @@ class TwitterTweetsRequest(MasaProtocolRequest):
 
         bt.logging.success(f"Sending Total: {len(finalData)} tweets to validator")
         #print(f"Sending Total: {len(finalData)}/{sizeTwittersCount} tweets to validator")
-        self.format(finalData)
+        #self.format(finalData)
         return finalData
