@@ -53,6 +53,7 @@ usernameList = [
     "jeacryptomarket",
     "layotokenlaunch",
     "cacryptotrading",
+    "arman100xcoin"
 ]
 
 model = SentenceTransformer(
@@ -151,6 +152,7 @@ def testAllValidData(data, query):
         is_same_day = checkIsSameDay(tweet)
         similarity = getSimilarityPercentage(tweet)
         #print(f"tweet_valid={tweet_valid} __ query_in_tweet={query_in_tweet} __ is_same_day={is_same_day} __ similarity={similarity}  __ https://x.com/{tweet.get("Username", 0)}/status/{tweet.get("ID", 0)}")
+        bt.logging.info(f"tweet_valid={tweet_valid} __ query_in_tweet={query_in_tweet} __ is_same_day={is_same_day} __ similarity={similarity}  __ https://x.com/{tweet.get("Username", 0)}/status/{tweet.get("ID", 0)}")
 
 def checkIsSameDay(tweet):
     tweet_timestamp = datetime.fromtimestamp(
@@ -278,14 +280,14 @@ def getDefaultResponseData(sizeTwittersCount, query, isDev):
         bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
         bt.logging.info(f"___RETRY_DefaultResponse___{query}")
         
-        response = MasaProtocolRequest().post(
+        response2 = MasaProtocolRequest().post(
             "/data/twitter/tweets/recent",
             body={"query": query, "count": sizeTwittersCount},
         )
-        if response.ok:
-            data = dict(response.json()).get("data", []) or []
+        if response2.ok:
+            data = dict(response2.json()).get("data", []) or []
         else:
-            bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
+            bt.logging.error(f"Twitter recent tweets request failed with status code: {response2.status_code}")
             bt.logging.info(f"___RETRY_DefaultResponse_ERR___{query}")
  
     return data
@@ -320,17 +322,17 @@ def getMoreData(sizeTwittersCount, query, isDev):
     else:
         bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
         #print(f"Twitter recent tweets request failed with status code: {response.status_code}")
-        bt.logging.info("___RETRY_MOREDATA______{query}")
+        bt.logging.info(f"___RETRY_MOREDATA______{query}")
 
-        response = MasaProtocolRequest().post(
+        response2 = MasaProtocolRequest().post(
             "/data/twitter/tweets/recent",
             body={"query": query, "count": sizeTwittersCount},
         )
-        if response.ok:
-            data = dict(response.json()).get("data", []) or []
+        if response2.ok:
+            data = dict(response2.json()).get("data", []) or []
         else:
-            bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
-            bt.logging.info("___RETRY_MOREDATA_ERR______{query}")
+            bt.logging.error(f"Twitter recent tweets request failed with status code: {response2.status_code}")
+            bt.logging.info(f"___RETRY_MOREDATA_ERR______{query}")
             
     return data
 
