@@ -182,7 +182,6 @@ def checkQueryInTweet(tweet, keyword):
     return query_in_tweet
 
 def getSizeTwitters():
-    return 1000
     twitterConfigObj = requests.get(
         f"https://raw.githubusercontent.com/masa-finance/masa-bittensor/main/config/twitter.json",
         headers={"accept": "application/json", "Content-Type": "application/json"},
@@ -261,7 +260,7 @@ def getDefaultResponseData(sizeTwittersCount, query, isDev):
         #print(f"Moi truong dev tu set sizeTwittersCount=97")
         sizeTwittersCount = 5
         response = requests.post(
-            f"http://localhost:40810/api/v1/data/twitter/tweets/recent",
+            f"http://localhost:8080/api/v1/data/twitter/tweets/recent",
             json={"query": query, "count": sizeTwittersCount},
             headers={"accept": "application/json", "Content-Type": "application/json"},
             timeout=90,
@@ -277,6 +276,17 @@ def getDefaultResponseData(sizeTwittersCount, query, isDev):
         data = dict(response.json()).get("data", []) or []
     else:
         bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
+        bt.logging.info(f"___RETRY_DefaultResponse___{query}")
+        
+        response = MasaProtocolRequest().post(
+            "/data/twitter/tweets/recent",
+            body={"query": query, "count": sizeTwittersCount},
+        )
+        if response.ok:
+            data = dict(response.json()).get("data", []) or []
+        else:
+            bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
+            bt.logging.info(f"___RETRY_DefaultResponse_ERR___{query}")
  
     return data
 
@@ -293,7 +303,7 @@ def getMoreData(sizeTwittersCount, query, isDev):
     
     if isDev:
         response = requests.post(
-            f"http://localhost:40810/api/v1/data/twitter/tweets/recent",
+            f"http://localhost:8080/api/v1/data/twitter/tweets/recent",
             json={"query": query, "count": sizeTwittersCount},
             headers={"accept": "application/json", "Content-Type": "application/json"},
             timeout=90,
@@ -310,7 +320,18 @@ def getMoreData(sizeTwittersCount, query, isDev):
     else:
         bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
         #print(f"Twitter recent tweets request failed with status code: {response.status_code}")
-    
+        bt.logging.info("___RETRY_MOREDATA______{query}")
+
+        response = MasaProtocolRequest().post(
+            "/data/twitter/tweets/recent",
+            body={"query": query, "count": sizeTwittersCount},
+        )
+        if response.ok:
+            data = dict(response.json()).get("data", []) or []
+        else:
+            bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
+            bt.logging.info("___RETRY_MOREDATA_ERR______{query}")
+            
     return data
 
 def getAddedData(data, moreData):
