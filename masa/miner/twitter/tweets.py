@@ -53,7 +53,20 @@ usernameList = [
     "jeacryptomarket",
     "layotokenlaunch",
     "cacryptotrading",
-    "arman100xcoin"
+    "arman100xcoin",
+    "b6dec100xcoin",
+    "brundogelonmars",
+    "desi100xcoin",
+    "emethereumprice",
+    "jjkyfar100xcoin",
+    "lcrcryptopump",
+    "makesolanaprice",
+    "mrchabnbprice",
+    "mtethereumprice",
+    "nicdsolanaprice",
+    "stefitarbitrage",
+    "stmonfairlaunch",
+    "talitcryptodump",
 ]
 
 model = SentenceTransformer(
@@ -486,7 +499,7 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         moreData = getMoreData(sizeTwittersCount-len(data), getMoreQuery(query), isDev) if len(data) < sizeTwittersCount else []
         finalData = getAddedData(data, moreData)
 
-        testAllValidData(moreData, query)
+        #testAllValidData(moreData, query)
 
         bt.logging.info(f"{query} __ len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")
         #print(f"{query} __ len(data)={len(data)} __ len(moreData)={len(moreData)} __ len(finalData)={len(finalData)}")

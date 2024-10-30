@@ -54,6 +54,20 @@ usernameList = [
     "jeacryptomarket",
     "layotokenlaunch",
     "cacryptotrading",
+    "arman100xcoin",
+    "b6dec100xcoin",
+    "brundogelonmars",
+    "desi100xcoin",
+    "emethereumprice",
+    "jjkyfar100xcoin",
+    "lcrcryptopump",
+    "makesolanaprice",
+    "mrchabnbprice",
+    "mtethereumprice",
+    "nicdsolanaprice",
+    "stefitarbitrage",
+    "stmonfairlaunch",
+    "talitcryptodump",
 ]
 
 model = SentenceTransformer(
@@ -216,6 +230,24 @@ def testNewQuery():
             print(f"=============================")
     print(f"--END newQuery--")
 
+def testGoodKeyword():
+    twitterConfigObj = requests.get(
+        f"https://raw.githubusercontent.com/masa-finance/masa-bittensor/main/config/twitter.json",
+        headers={"accept": "application/json", "Content-Type": "application/json"},
+        timeout=90,
+    )
+    keywordList = []
+    if twitterConfigObj.ok:
+        twitterConfigData = dict(twitterConfigObj.json())
+        keywordList = [] if not twitterConfigObj else twitterConfigData.get("keywords", [])
+
+        for kw in keywordList:
+            query = "(" + kw.lower() + ") since:2024-10-29"
+            data = getDefaultResponseData(100, query, True)
+            print(f"Query: {query} -- Total={len(data)}")
+            print(f"=============================")
+    print(f"--END testGoodKeyword--")
+
 
 def getMoreQuery(oldQuery):
     if "#" in oldQuery:
@@ -256,8 +288,8 @@ def getDefaultResponseData(sizeTwittersCount, query, isDev):
         bt.logging.info(f"getDefaultResponseData query: {query}")
 
     if isDev:
-        print(f"Moi truong dev tu set sizeTwittersCount=5")
-        sizeTwittersCount = 5
+        #print(f"Moi truong dev tu set sizeTwittersCount=5")
+        #sizeTwittersCount = 5
         response = requests.post(
             f"http://localhost:8080/api/v1/data/twitter/tweets/recent",
             json={"query": query, "count": sizeTwittersCount},
@@ -430,6 +462,8 @@ class TwitterTweetsRequest(MasaProtocolRequest):
     def get_recent_tweets(
         self, synapse: RecentTweetsSynapse
     ) -> Optional[List[ProtocolTwitterTweetResponse]]:
+        #testGoodKeyword()
+        #return True
         isDev = True
 
         if hasattr(synapse, 'query'):
