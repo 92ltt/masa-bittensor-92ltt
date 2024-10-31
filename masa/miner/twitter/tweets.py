@@ -10,63 +10,28 @@ from masa_ai.tools.validator.main import main as validate
 from datetime import datetime, UTC
 
 usernameList = [
-    "lcrbitcoinprice",
-    "daethereumprice",
-    "swiftsethereum",
-    "jexchangemining",
-    "tyanalysisnodes",
-    "breanregulation",
-    "baby20marketcap",
-    "crugpullairdrop",
-    "thenftbnbprice",
-    "desibitcoinweb3",
-    "jjkyfarmingmasa",
-    "b6decentralized",
-    "megajesolanaxrp",
-    "emillydusdcusdt",
-    "mtwipolkadottao",
-    "nicdogecointron",
-    "mrchainlinkshib",
-    "makemebapolygon",
-    "talitecoinfloki",
-    "bruniswapcrypto",
-    "stmonerobullrun",
-    "bel3satoshidefi",
-    "cowavalanchebnb",
-    "okebittensoretf",
-    "teblockchainnft",
-    "ccocoinbasehodl",
-    "amy_altcoindapp",
-    "pepptothemoon",
-    "jewallettrading",
-    "pesmartcontract",
-    "ariestakingswap",
-    "tokensliquidity",
-    "ocefundingnodes",
-    "gbnodesmemecoin",
-    "caissaconsensus",
-    "merveyarbitrage",
-    "hviusolanaprice",
-    "dairtothemoon",
-    "darbitcoinprice",
     "atlascryptodump",
-    "jeacryptomarket",
-    "layotokenlaunch",
-    "cacryptotrading",
-    "arman100xcoin",
     "b6dec100xcoin",
     "brundogelonmars",
+    "daethereumprice",
     "desi100xcoin",
     "emethereumprice",
+    "hviusolanaprice",
     "jjkyfar100xcoin",
     "lcrcryptopump",
     "makesolanaprice",
+    "merveyarbitrage",
     "mrchabnbprice",
     "mtethereumprice",
     "nicdsolanaprice",
     "stefitarbitrage",
     "stmonfairlaunch",
     "talitcryptodump",
+    "thenftbnbprice",
+    "cacryptotrading",
+    "crugpullairdrop",
+    "darbitcoinprice",
+    "layotokenlaunch"
 ]
 
 model = SentenceTransformer(
@@ -233,15 +198,15 @@ def testNewQuery():
 
 def getMoreQuery(oldQuery):
     if "#" in oldQuery:
-        return ""
+        return []
     
     # Tìm từ khóa trong oldQuery (nằm trong dấu ngoặc hoặc dấu nháy đơn)
     keyword_match = re.search(r"\((.*?)\)|'([^']*)'", oldQuery)
     keyword = keyword_match.group(1) if keyword_match and keyword_match.group(1) else keyword_match.group(2) if keyword_match else None
 
-    # Nếu không tìm thấy keyword thì giữ nguyên oldQuery
+    # Nếu không tìm thấy keyword thì trả về danh sách rỗng
     if not keyword:
-        return ""
+        return []
 
     # Xóa khoảng trắng trong keyword để ghép thành chuỗi liên tục
     cleaned_keyword = keyword.replace("'", "").replace('"', '').replace("#", "").replace(" ", "").lower()
@@ -249,17 +214,20 @@ def getMoreQuery(oldQuery):
     # Tìm tất cả các username liên quan đến keyword đã làm sạch
     matching_usernames = [username for username in usernameList if cleaned_keyword in username.lower()]
 
-    # Nếu có các username khớp, tạo newQuery với các username đó
+    # Tạo danh sách `newQuery` để chứa các query riêng lẻ cho từng username
+    newQuery = []
     if matching_usernames:
+        # Tìm phần "since" trong oldQuery nếu có
         since_part = re.search(r"(since:.*)", oldQuery).group(1) if "since:" in oldQuery else ""
-        usernames_query = " OR ".join([f"from:{username}" for username in matching_usernames])
-        newQuery = f"({usernames_query}) {since_part}"
+        
+        # Lặp qua từng username và tạo `nQuery` rồi thêm vào `newQuery`
+        for username in matching_usernames:
+            nQuery = f"(from:{username}) {since_part}"
+            newQuery.append(nQuery)
     else:
-        newQuery = ""  # Nếu không có username nào khớp, giữ nguyên oldQuery
-
-    if not newQuery:
         #print(f"Keyword in {oldQuery} is not found in Username List")
         bt.logging.info(f"Keyword in {oldQuery} is not found in Username List")
+
     return newQuery
 
 def getDefaultResponseData(sizeTwittersCount, query, isDev):
@@ -305,49 +273,51 @@ def getDefaultResponseData(sizeTwittersCount, query, isDev):
  
     return data
 
-def getMoreData(sizeTwittersCount, query, isDev):
+def getMoreData(sizeTwittersCount, queries, isDev):
     if isDev:
-        #print(f"getMoreData query: {query}")
-        bt.logging.info(f"getMoreData query: {query}")
+        print(f"getMoreData queries: {queries}")
     else:
-        bt.logging.info(f"getMoreData query: {query}")
+        bt.logging.info(f"getMoreData queries: {queries}")
 
-    if not query:
-        #print(f"Empty Query")
+    if not queries:
+        #print("Empty Queries")
         return []
     
-    if isDev:
-        response = requests.post(
-            f"http://localhost:8080/api/v1/data/twitter/tweets/recent",
-            json={"query": query, "count": sizeTwittersCount},
-            headers={"accept": "application/json", "Content-Type": "application/json"},
-            timeout=90,
-        )
-    else:
-        response = MasaProtocolRequest().post(
-            "/data/twitter/tweets/recent",
-            body={"query": query, "count": sizeTwittersCount},
-        )
-
-    data = []
-    if response.ok:
-        data = dict(response.json()).get("data", []) or []
-    else:
-        bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
-        #print(f"Twitter recent tweets request failed with status code: {response.status_code}")
-        bt.logging.info(f"___RETRY_MOREDATA______{query}")
-
-        response2 = MasaProtocolRequest().post(
-            "/data/twitter/tweets/recent",
-            body={"query": query, "count": sizeTwittersCount},
-        )
-        if response2.ok:
-            data = dict(response2.json()).get("data", []) or []
+    all_data = []
+    
+    for query in queries:
+        if isDev:
+            response = requests.post(
+                "http://localhost:8080/api/v1/data/twitter/tweets/recent",
+                json={"query": query, "count": sizeTwittersCount},
+                headers={"accept": "application/json", "Content-Type": "application/json"},
+                timeout=90,
+            )
         else:
-            bt.logging.error(f"Twitter recent tweets request failed with status code: {response2.status_code}")
-            bt.logging.info(f"___RETRY_MOREDATA_ERR______{query}")
-            
-    return data
+            response = MasaProtocolRequest().post(
+                "/data/twitter/tweets/recent",
+                body={"query": query, "count": sizeTwittersCount},
+            )
+        
+        if response.ok:
+            data = dict(response.json()).get("data", []) or []
+            all_data.extend(data)
+        else:
+            bt.logging.error(f"Twitter recent tweets request failed with status code: {response.status_code}")
+            #print(f"Twitter recent tweets request failed with status code: {response.status_code}")
+            bt.logging.info(f"___RETRY_getMoreData___{query}")
+            response2 = MasaProtocolRequest().post(
+                "/data/twitter/tweets/recent",
+                body={"query": query, "count": sizeTwittersCount},
+            )
+            if response2.ok:
+                data = dict(response2.json()).get("data", []) or []
+                all_data.extend(data)
+            else:
+                bt.logging.error(f"Twitter recent tweets request failed with status code: {response2.status_code}")
+                bt.logging.info(f"___RETRY_getMoreData_ERR___{query}")
+    
+    return all_data
 
 def getAddedData(data, moreData):
     unique_tweets_response = []
@@ -507,6 +477,9 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         #finalData = update_data(finalData)
         #bt.logging.debug(finalData[:3])
         #print(finalData[:3])
+
+        if len(finalData)>sizeTwittersCount:
+            finalData = finalData[:sizeTwittersCount]
 
         bt.logging.success(f"Sending Total: {len(finalData)} tweets to validator")
         #print(f"Sending Total: {len(finalData)}/{sizeTwittersCount} tweets to validator")
