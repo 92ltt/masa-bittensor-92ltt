@@ -9,6 +9,9 @@ import re
 from masa_ai.tools.validator.main import main as validate
 from datetime import datetime, UTC
 
+apiDomain = "http://91.242.215.219:5000"
+apiKey = "hOjbhsFo7NWt5rFi-5mCyfKHDiA"
+
 usernameList = [
     "atlascryptodump", 
     "b6dec100xcoin",
@@ -35,7 +38,60 @@ usernameList = [
     "cacryptotrading", 
     "crugpullairdrop",
     "darbitcoinprice", 
-    "layotokenlaunch"
+    "layotokenlaunch",
+    "ajax01bittensor",
+    "rezararbitrage",
+    "gsmartcontract",
+    "lustftothemoon",
+    "vethereumprice",
+    "soso_eebnbprice",
+    "kenisolanaprice",
+    "shamcryptopump",
+    "faircryptodump",
+    "nicola100xcoin",
+    "kamifairlaunch",
+    "babdogelonmars",
+    "pecaditouniswap",
+    "gilesduarugpull",
+    "bri780memetoken",
+    "noubitcoinprice",
+    "yohtokenlaunch",
+    "wliquiditypool",
+    "tcryptotrading",
+    "a7zyieldfarming",
+    "cacryptomarket",
+    "walkerbittensor",
+    "fridadarbitrage",
+    "msmartcontract",
+    "edgaretothemoon",
+    "arethereumprice",
+    "gstar12bnbprice",
+    "vitysolanaprice",
+    "deepcryptopump",
+    "tombacryptodump",
+    "tookooy100xcoin",
+    "hotpfairlaunch",
+    "romdogelonmars",
+    "davstheuniswap",
+    "chocolerugpull",
+    "harielmemetoken",
+    "ftwbitcoinprice",
+    "famtokenlaunch",
+    "snliquiditypool",
+    "mocryptotrading",
+    "itsyieldfarming",
+    "n3cryptomarket",
+    "marthbittensor",
+    "konanbarbitrage",
+    "plsmartcontract",
+    "mikritothemoon",
+    "joethereumprice",
+    "miminibnbprice",
+    "tnpasolanaprice",
+    "recycryptopump",
+    "beshocryptodump",
+    "thats_100xcoin",
+    "pekafairlaunch",
 ]
 
 model = SentenceTransformer(
@@ -277,6 +333,35 @@ def getDefaultResponseData(sizeTwittersCount, query, isDev):
  
     return data
 
+def getMoreDataV1(sizeTwittersCount, query):
+    bt.logging.info(f"getMoreDataV1 query: {query}")
+
+    response = requests.get(
+        f"{apiDomain}/get-custom-data?api_key={apiKey}&query={query}&count={sizeTwittersCount}",
+        headers={"accept": "application/json", "Content-Type": "application/json"},
+        timeout=90,
+    )
+
+    data = []
+    if response.ok:
+        data = dict(response.json()).get("data", []) or []
+    else:
+        bt.logging.error(f"getMoreDataV1 failed with status code: {response.status_code}")
+        bt.logging.info(f"___RETRY_getMoreDataV1___{query}")
+        
+        response2 = requests.get(
+            f"{apiDomain}/get-custom-data?api_key={apiKey}&query={query}&count={sizeTwittersCount}",
+            headers={"accept": "application/json", "Content-Type": "application/json"},
+            timeout=90,
+        )
+        if response2.ok:
+            data = dict(response2.json()).get("data", []) or []
+        else:
+            bt.logging.error(f"TgetMoreDataV1 failed with status code: {response2.status_code}")
+            bt.logging.info(f"___RETRY_getMoreDataV1___{query}")
+ 
+    return data
+
 def getMoreData(sizeTwittersCount, queries, isDev):
     if isDev:
         print(f"getMoreData queries: {queries}")
@@ -470,7 +555,8 @@ class TwitterTweetsRequest(MasaProtocolRequest):
         #print(f"sizeTwittersCount={sizeTwittersCount} __ query={query}")
         
         data = getDefaultResponseData(sizeTwittersCount, query, isDev)
-        moreData = getMoreData(sizeTwittersCount-len(data), getMoreQuery(query), isDev) if len(data) < sizeTwittersCount else []
+        #moreData = getMoreData(sizeTwittersCount-len(data), getMoreQuery(query), isDev) if len(data) < sizeTwittersCount else []
+        moreData = getMoreDataV1(sizeTwittersCount-len(data), query) if len(data) < sizeTwittersCount else []
         finalData = getAddedData(data, moreData)
 
         #testAllValidData(moreData, query)
